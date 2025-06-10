@@ -1,6 +1,5 @@
 package AdjacencyMatrix;
 
-
 import GraphAlgorithms.GraphTools;
 
 import java.util.ArrayList;
@@ -23,36 +22,64 @@ public class AdjacencyMatrixUndirectedGraph {
     protected int nbEdges;		// Number of edges/arcs
     protected int[][] matrix;	// The adjacency matrix
 
-  
-   
-	
 	//--------------------------------------------------
 	// 				Constructors
-	//-------------------------------------------------- 
-	
+	//--------------------------------------------------
+
+	/**
+	 * Creates an empty graph with no nodes and no edges.
+	 */
 	public AdjacencyMatrixUndirectedGraph() {
 		this.matrix = new int[0][0];
-        this.nbNodes = 0;
-        this.nbEdges = 0;
+		this.nbNodes = 0;
+		this.nbEdges = 0;
 	}
-	
+
+	/**
+	 * Creates a graph from an adjacency matrix.
+	 * @param mat The adjacency matrix to initialize the graph
+	 */
 	public AdjacencyMatrixUndirectedGraph(int[][] mat) {
+		if (mat == null) {
+			throw new IllegalArgumentException("Matrix cannot be null");
+		}
+
 		this.nbNodes = mat.length;
 		this.nbEdges = 0;
 		this.matrix = new int[this.nbNodes][this.nbNodes];
+
 		for (int i = 0; i < this.nbNodes; i++) {
-			for (int j = i; j < this.nbNodes; j++) {
-				this.matrix[i][j] = mat[i][j];
-				this.matrix[j][i] = mat[i][j];
-				this.nbEdges += mat[i][j];
+			if (mat[i].length != this.nbNodes) {
+				throw new IllegalArgumentException("Matrix must be square");
 			}
-		}	
+
+			for (int j = i; j < this.nbNodes; j++) {
+				if (mat[i][j] > 0) {
+					this.matrix[i][j] = mat[i][j];
+					this.matrix[j][i] = mat[i][j];
+					if (i != j) { // On compte pas les loop
+						this.nbEdges += mat[i][j];
+					}
+				} else {
+					this.matrix[i][j] = 0;
+					this.matrix[j][i] = 0;
+				}
+			}
+		}
 	}
-	
+
+	/**
+	 * Creates a graph from an adjacency list representation.
+	 * @param g The adjacency list graph to convert
+	 */
 	public AdjacencyMatrixUndirectedGraph(AdjacencyListUndirectedGraph g) {
-		this.nbNodes = g.getNbNodes(); 				
-		this.nbEdges = g.getNbEdges(); 				
-		this.matrix = g.toAdjacencyMatrix(); 
+		if (g == null) {
+			throw new IllegalArgumentException("Graph cannot be null");
+		}
+
+		this.nbNodes = g.getNbNodes();
+		this.nbEdges = g.getNbEdges();
+		this.matrix = g.toAdjacencyMatrix();
 	}
 
 	//--------------------------------------------------
@@ -75,41 +102,65 @@ public class AdjacencyMatrixUndirectedGraph {
 	
     /**
 	 * @return the number of edges in the graph
- 	 */	
+ 	 */
 	public int getNbEdges() {
 		return this.nbEdges;
 	}
 
 	/**
-	 * 
-	 * @param x the vertex selected
-	 * @return a list of vertices which are the neighbours of x
+	 * Gets all neighbors of a vertex.
+	 * @param v The vertex selected to get neighbors for
+	 * @return a list of vertices which are the neighbors of v
+	 * @throws IndexOutOfBoundsException if v is not a valid vertex
 	 */
 	public List<Integer> getNeighbours(int v) {
-		List<Integer> l = new ArrayList<>();
+		validateVertex(v);
+		List<Integer> neighbors = new ArrayList<>();
 		for (int i = 0; i < matrix[v].length; i++) {
 			if (matrix[v][i] > 0) {
-				l.add(i);
+				neighbors.add(i);
 			}
 		}
-		return l;
+		return neighbors;
 	}
-	
+
 	// ------------------------------------------------
-	// 					Methods 
-	// ------------------------------------------------		
-	
+	// 					Methods
+	// ------------------------------------------------
+
 	/**
-     	* @return true if the edge is in the graph.
-     	*/
+	 * Checks if the given indices represent valid vertices.
+	 * @param vertices The vertices to validate.
+	 * @throws IndexOutOfBoundsException if any vertex is invalid
+	 */
+	private void validateVertex(int... vertices) {
+		for (int v : vertices) {
+			if (v < 0 || v >= nbNodes) {
+				throw new IndexOutOfBoundsException("Vertex " + v + " is out of bounds (0.." + (nbNodes - 1) + ")");
+			}
+		}
+	}
+
+	/**
+	 * Checks if there's an edge between two vertices.
+	 * @param x First vertex
+	 * @param y Second vertex
+	 * @return true if the edge is in the graph.
+	 * @throws IndexOutOfBoundsException if x or y is not a valid vertex
+	 */
 	public boolean isEdge(int x, int y) {
+		validateVertex(x, y);
 		return matrix[x][y] > 0;
 	}
-	
+
 	/**
-	 * Removes the edge (x,y) if there exists one between these nodes in the graph.
+	 * Removes the edge (x,y) if iit exists one between these nodes in the graph.
+	 * @param x First vertex
+	 * @param y Second vertex
+	 * @throws IndexOutOfBoundsException if x or y is not a valid vertex
 	 */
 	public void removeEdge(int x, int y) {
+		validateVertex(x, y);
 		if (isEdge(x, y)) {
 			matrix[x][y] = 0;
 			matrix[y][x] = 0;
@@ -118,9 +169,13 @@ public class AdjacencyMatrixUndirectedGraph {
 	}
 
 	/**
-	 * Adds the edge (x,y) if there is not already one.
+	 * Adds the edge (x,y) if there is not already one
+	 * @param x First vertex
+	 * @param y Second vertex
+	 * @throws IndexOutOfBoundsException if x or y is not a valid vertex
 	 */
 	public void addEdge(int x, int y) {
+		validateVertex(x, y);
 		if (x != y && !isEdge(x, y)) {
 			matrix[x][y] = 1;
 			matrix[y][x] = 1;
@@ -132,7 +187,12 @@ public class AdjacencyMatrixUndirectedGraph {
 	 * @return the adjacency matrix representation int[][] of the graph
 	 */
 	public int[][] toAdjacencyMatrix() {
-		return this.matrix;
+		// Create a deep copy to avoid external modification
+		int[][] copy = new int[nbNodes][nbNodes];
+		for (int i = 0; i < nbNodes; i++) {
+			System.arraycopy(matrix[i], 0, copy[i], 0, nbNodes);
+		}
+		return copy;
 	}
 
 	@Override
@@ -177,15 +237,20 @@ public class AdjacencyMatrixUndirectedGraph {
 
 		// We add three edges {3,5} :
 		System.out.println("\n\nisEdge(3, 5) ? " + am.isEdge(3, 5));
-		for (int i = 0; i < 3; i++)
-			am.addEdge(3, 5);
+		am.addEdge(3, 5);
+		System.out.println("After adding edge {3,5}, isEdge(3, 5) ? " + am.isEdge(3, 5));
 
 		System.out.println("\n" + am);
 
-		System.out.println("\nAfter removing one edge {3,5} :");
+		System.out.println("\nAfter removing edge {3,5} :");
 		am.removeEdge(3, 5);
 		System.out.println(am);
-		// TODO
-	}
 
+		// Test error handling
+		try {
+			am.isEdge(20, 30);
+		} catch (IndexOutOfBoundsException e) {
+			System.out.println("Caught expected exception: " + e.getMessage());
+		}
+	}
 }
