@@ -12,7 +12,7 @@ import AdjacencyList.AdjacencyListDirectedGraph;
 
 /**
  * This class represents the directed graphs structured by an adjacency matrix.
- * We consider only simple graph
+ * We consider only simple graph.
  */
 public class AdjacencyMatrixDirectedGraph {
 
@@ -115,25 +115,44 @@ public class AdjacencyMatrixDirectedGraph {
 	
 	/**
 	 * @return true if the arc (from,to) exists in the graph.
- 	 */
+	 */
 	public boolean isArc(int from, int to) {
-		// A completer
-		return true;
+        validateVertex(from, to);
+		return matrix[from][to] > 0;
 	}
 
 	/**
-	 * removes the arc (from,to) if there exists one between these nodes in the graph.
+	 * Removes the arc (from,to) if there exists one between these nodes in the graph.
 	 */
 	public void removeArc(int from, int to) {
-		// A completer
+        validateVertex(from, to);
+		if (isArc(from, to)) {
+			matrix[from][to] = 0;
+			nbArcs--;
+		}
 	}
 
 	/**
-	 * Adds the arc (from,to). 
+	 * Adds the arc (from,to).
 	 */
 	public void addArc(int from, int to) {
-		// A completer
+        validateVertex(from, to);
+		if (from != to && !isArc(from, to)) {
+			matrix[from][to] = 1;
+			nbArcs++;
+		}
 	}
+
+	/**
+	 * Vérifie que les indices de sommets sont valides.
+	 */
+    private void validateVertex(int... vertices) {
+        for (int v : vertices) {
+            if (v < 0 || v >= nbNodes) {
+                throw new IndexOutOfBoundsException("Vertex " + v + " is out of bounds (0.." + (nbNodes - 1) + ")");
+            }
+        }
+    }
 
 	/**
 	 * @return a new graph which is the inverse graph of this.matrix
@@ -176,6 +195,18 @@ public class AdjacencyMatrixDirectedGraph {
 		for (Integer integer : t2) {
 			System.out.print(integer + ", ");
 		}
-		// A completer
+
+		// Test isArc
+		System.out.println("\nisArc(1, 2): " + am.isArc(1, 2));
+
+		// Test addArc
+		am.addArc(1, 2);
+		System.out.println("After adding arc (1, 2):");
+		System.out.println(am);
+
+		// Test removeArc
+		am.removeArc(1, 2);
+		System.out.println("After removing arc (1, 2):");
+		System.out.println(am);
 	}
 }
