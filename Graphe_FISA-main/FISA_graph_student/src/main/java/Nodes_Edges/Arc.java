@@ -65,7 +65,6 @@ public class Arc extends AbstractEdgeArc {
 	@Override
 	public boolean equals(Object e) {
 		return e instanceof AbstractEdgeArc &&
-				( ((Arc) e).getFirstNode() == this.getFirstNode() && ((Arc) e).getSecondNode() == this.getSecondNode() );
+				( ((Arc) e).getFirstNode().equals(this.getFirstNode()) && ((Arc) e).getSecondNode().equals(this.getSecondNode()) );
 	}
-
 }
