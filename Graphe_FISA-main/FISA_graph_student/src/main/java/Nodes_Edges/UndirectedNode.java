@@ -45,7 +45,7 @@ public class UndirectedNode extends AbstractNode {
 	
 
 	/**
-	 * add a new edge with its value cost. If the neighbour exists, the weight is changed.
+	 * Add a new edge with its value cost. If the neighbour exists, the weight is changed.
 	 */
 	public void addEdge(Edge e1) {
 		if(!this.getIncidentEdges().contains(e1)) {			
@@ -57,7 +57,7 @@ public class UndirectedNode extends AbstractNode {
 			} 			
 		}
 		else {
-			// Update of the existing weight
+			// Update of the existing weight.
 			int indexEdge;
 			if(this.getIncidentEdges().contains(e1)){
 				indexEdge = this.getIncidentEdges().indexOf(e1);
@@ -68,6 +68,4 @@ public class UndirectedNode extends AbstractNode {
 			this.getIncidentEdges().get(indexEdge).setWeight(e1.getWeight());
 		}
 	}
-
-	
 }

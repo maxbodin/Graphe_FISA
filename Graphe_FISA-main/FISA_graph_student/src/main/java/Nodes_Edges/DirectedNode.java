@@ -1,10 +1,7 @@
 package Nodes_Edges;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class DirectedNode extends AbstractNode {
 
@@ -69,28 +66,22 @@ public class DirectedNode extends AbstractNode {
 	 * add a new edge with its value cost. If the successor exists, the weight is changed.
 	 */
 	public void addArc(Arc a1) {
-		if(a1.getFirstNode().equals(this)) { // case where the arc is out-going from "this".
-			if(!this.getArcSucc().contains(a1)) {		
+		if (a1.getFirstNode().equals(this)) { // case where the arc is out-going from "this".
+			if (!this.getArcSucc().contains(a1)) {
 				this.arcSucc.add(a1);
-			}
-			else {
+			} else {
 				// Update of the existing weight
 				int indexEdge = this.getArcSucc().indexOf(a1);
 				this.getArcSucc().get(indexEdge).setWeight(a1.getWeight());
 			}
-		}
-		else if(a1.getSecondNode().equals(this)) { // case where the arc is in-going to "this".
-			if(!this.getArcPred().contains(a1)) {		
+		} else if (a1.getSecondNode().equals(this)) { // case where the arc is in-going to "this".
+			if (!this.getArcPred().contains(a1)) {
 				this.arcPred.add(a1);
-			}
-			else {
+			} else {
 				// Update of the existing weight
 				int indexEdge = this.getArcPred().indexOf(a1);
 				this.getArcPred().get(indexEdge).setWeight(a1.getWeight());
 			}
 		}
-				
 	}
-	
-
 }
