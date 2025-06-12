@@ -3,7 +3,6 @@ package AdjacencyMatrix;
 import GraphAlgorithms.GraphTools;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import AdjacencyList.AdjacencyListUndirectedGraph;
@@ -223,34 +222,103 @@ public class AdjacencyMatrixUndirectedGraph {
 	}
 
 	public static void main(String[] args) {
-		int[][] mat2 = GraphTools.generateGraphData(10, 35, false, true, false, 100001);
-		AdjacencyMatrixUndirectedGraph am = new AdjacencyMatrixUndirectedGraph(mat2);
-		System.out.println(am);
-		System.out.println("n = " + am.getNbNodes() + "\nm = " + am.getNbEdges() + "\n");
+        // Test 1: Create a graph with a defined matrix.
+        int[][] definedMatrix = {
+            {0, 1, 0, 1, 0},
+            {1, 0, 1, 0, 0},
+            {0, 1, 0, 1, 1},
+            {1, 0, 1, 0, 1},
+            {0, 0, 1, 1, 0}
+        };
+        System.out.println("Test 1: Creating a graph with defined matrix.");
+        AdjacencyMatrixUndirectedGraph graph = new AdjacencyMatrixUndirectedGraph(definedMatrix);
+        System.out.println(graph);
+        System.out.println("Number of nodes = " + graph.getNbNodes() + " (Should be 5) " + (graph.getNbNodes() == 5 ? "✅" : "❌"));
+        System.out.println("Number of edges = " + graph.getNbEdges() + " (Should be 6) " + (graph.getNbEdges() == 6 ? "✅" : "❌"));
 
-		// Neighbors of vertex 2 :
-		System.out.println("Neighbours of vertex 2 : ");
-		List<Integer> t2 = am.getNeighbours(2);
-		for (Integer integer : t2) {
-			System.out.print(integer + ", ");
-		}
+        // Test 2: Check initial edges.
+        System.out.println("\nTest 2: Checking initial edges.");
+        boolean edge01 = graph.isEdge(0, 1);
+        boolean edge02 = graph.isEdge(0, 2);
+        boolean edge12 = graph.isEdge(1, 2);
+        System.out.println("Edge (0,1) exists? " + edge01 + " (Should be TRUE) " + (edge01 ? "✅" : "❌"));
+        System.out.println("Edge (0,2) exists? " + edge02 + " (Should be FALSE) " + (!edge02 ? "✅" : "❌"));
+        System.out.println("Edge (1,2) exists? " + edge12 + " (Should be TRUE) " + (edge12 ? "✅" : "❌"));
 
-		// We add three edges {3,5} :
-		System.out.println("\n\nisEdge(3, 5) ? " + am.isEdge(3, 5));
-		am.addEdge(3, 5);
-		System.out.println("After adding edge {3,5}, isEdge(3, 5) ? " + am.isEdge(3, 5));
+        // Test 3: Test neighbors.
+        System.out.println("\nTest 3: Testing getNeighbours.");
+        List<Integer> neighbors2 = graph.getNeighbours(2);
+        System.out.println("Neighbours of vertex 2: " + neighbors2);
+        boolean correctNeighbors = neighbors2.contains(1) && neighbors2.contains(3) && 
+                                 neighbors2.contains(4) && neighbors2.size() == 3;
+        System.out.println("Vertex 2 has correct neighbors? " + correctNeighbors + " (Should be TRUE) " + 
+                         (correctNeighbors ? "✅" : "❌"));
 
-		System.out.println("\n" + am);
+        // Test 4: Add new edge.
+        System.out.println("\nTest 4: Adding new edge.");
+        graph.addEdge(0, 2);
+        boolean edge02AfterAdd = graph.isEdge(0, 2);
+        boolean edge20AfterAdd = graph.isEdge(2, 0); // Test symmetry.
+        System.out.println("After adding edge (0,2):");
+        System.out.println("Edge (0,2) exists? " + edge02AfterAdd + " (Should be TRUE) " + (edge02AfterAdd ? "✅" : "❌"));
+        System.out.println("Edge (2,0) exists? " + edge20AfterAdd + " (Should be TRUE) " + (edge20AfterAdd ? "✅" : "❌"));
+        System.out.println(graph);
 
-		System.out.println("\nAfter removing edge {3,5} :");
-		am.removeEdge(3, 5);
-		System.out.println(am);
+        // Test 5: Remove edge.
+        System.out.println("\nTest 5: Removing edge.");
+        graph.removeEdge(0, 2);
+        boolean edge02AfterRemove = graph.isEdge(0, 2);
+        boolean edge20AfterRemove = graph.isEdge(2, 0); // Test symmetry.
+        System.out.println("After removing edge (0,2):");
+        System.out.println("Edge (0,2) exists? " + edge02AfterRemove + " (Should be FALSE) " + (!edge02AfterRemove ? "✅" : "❌"));
+        System.out.println("Edge (2,0) exists? " + edge20AfterRemove + " (Should be FALSE) " + (!edge20AfterRemove ? "✅" : "❌"));
+        System.out.println(graph);
 
-		// Test error handling
-		try {
-			am.isEdge(20, 30);
-		} catch (IndexOutOfBoundsException e) {
-			System.out.println("Caught expected exception: " + e.getMessage());
-		}
-	}
+        // Test 6: Try to add self-loop.
+        System.out.println("\nTest 6: Testing self-loop prevention.");
+        graph.addEdge(1, 1);
+        System.out.println("Self-loop (1,1) was prevented? " + (!graph.isEdge(1, 1)) + " (Should be TRUE) " + 
+                         (!graph.isEdge(1, 1) ? "✅" : "❌"));
+
+        // Test 7: Error handling.
+        System.out.println("\nTest 7: Error handling.");
+        // Test out of bounds
+        try {
+            graph.isEdge(20, 30);
+            System.out.println("❌ Failed to catch invalid vertices.");
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Successfully caught invalid vertices exception ✅");
+        }
+
+        // Test 8: Matrix symmetry.
+        System.out.println("\nTest 8: Testing matrix symmetry.");
+        boolean isSymmetric = true;
+        for (int i = 0; i < graph.getNbNodes(); i++) {
+            for (int j = 0; j < graph.getNbNodes(); j++) {
+                if (graph.matrix[i][j] != graph.matrix[j][i]) {
+                    isSymmetric = false;
+                    break;
+                }
+            }
+        }
+        System.out.println("Matrix is symmetric? " + isSymmetric + " (Should be TRUE) " + (isSymmetric ? "✅" : "❌"));
+
+        // Test 9: Random graph.
+        System.out.println("\nTest 9: Testing with random generated graph.");
+        int[][] randomMatrix = GraphTools.generateGraphData(5, 8, false, true, false, 100001);
+        AdjacencyMatrixUndirectedGraph randomGraph = new AdjacencyMatrixUndirectedGraph(randomMatrix);
+        System.out.println(randomGraph);
+
+		// Verify symmetry in random graph.
+        boolean randomIsSymmetric = true;
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (randomGraph.matrix[i][j] != randomGraph.matrix[j][i]) {
+                    randomIsSymmetric = false;
+                    break;
+                }
+            }
+        }
+        System.out.println("Random graph is symmetric? " + randomIsSymmetric + " (Should be TRUE) " + (isSymmetric ? "✅" : "❌"));
+    }
 }
