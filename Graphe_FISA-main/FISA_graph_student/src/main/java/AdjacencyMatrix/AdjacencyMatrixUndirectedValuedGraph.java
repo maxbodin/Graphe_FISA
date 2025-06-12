@@ -39,15 +39,30 @@ public class AdjacencyMatrixUndirectedValuedGraph extends AdjacencyMatrixUndirec
 		}
 	}
 
+	@Override
 	public String toString() {
-		StringBuilder s = new StringBuilder("\n Matrix of Costs: \n");
-		for (int[] lineCost : this.matrix) {
-			for (int i : lineCost) {
-				s.append(i).append("\t");
+		StringBuilder s = new StringBuilder("\nMatrix of Costs:\n    ");
+
+		// Column headers.
+		for (int i = 0; i < nbNodes; i++) {
+			s.append(String.format("%3d", i));
+		}
+		s.append("\n   ");
+
+		// Separator line.
+		for (int i = 0; i < 3 * nbNodes; i++) {
+			s.append("-");
+		}
+		s.append("\n");
+
+		// Matrix rows with row indices.
+		for (int i = 0; i < nbNodes; i++) {
+			s.append(String.format("%2d |", i));
+			for (int j = 0; j < nbNodes; j++) {
+				s.append(String.format("%3d", matrix[i][j]));
 			}
 			s.append("\n");
 		}
-		s.append("\n");
 		return s.toString();
 	}
 	
