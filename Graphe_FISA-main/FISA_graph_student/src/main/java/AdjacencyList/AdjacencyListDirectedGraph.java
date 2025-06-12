@@ -3,23 +3,14 @@ package AdjacencyList;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
-import GraphAlgorithms.GraphTools;
 import Nodes_Edges.Arc;
 import Nodes_Edges.DirectedNode;
-import Nodes_Edges.Edge;
-import Nodes_Edges.UndirectedNode;
-
-
 
 public class AdjacencyListDirectedGraph {
 
 	//--------------------------------------------------
     // 				Class variables
     //--------------------------------------------------
-
-	private static int _DEBBUG =0;
 	
 	protected List<DirectedNode> nodes; // list of the nodes in the graph
 	protected List<Arc> arcs; // list of the arcs in the graph
@@ -28,7 +19,6 @@ public class AdjacencyListDirectedGraph {
 	
     
 
-    
     //--------------------------------------------------
     // 				Constructors
     //--------------------------------------------------
@@ -89,8 +79,7 @@ public class AdjacencyListDirectedGraph {
         	Arc a2 = new Arc(a1.getFirstNode(),a1.getSecondNode(),a1.getWeight());
         	new_n.addArc(a2);
         	other_n.addArc(a2);
-        }  
-
+        }
     }
 
     // ------------------------------------------
@@ -129,7 +118,20 @@ public class AdjacencyListDirectedGraph {
 	 * @return true if arc (from,to) exists in the graph
  	 */
     public boolean isArc(DirectedNode from, DirectedNode to) {
-    	// A completer
+        if (from == null || to == null) {
+            throw new IllegalArgumentException("Nodes cannot be null.");
+        }
+
+        if (from.equals(to)) {
+            throw new IllegalArgumentException("Cannot check an arc from a node to itself.");
+        }
+
+        for (Arc a : this.arcs) {
+            if (a.getFirstNode().equals(from) && a.getSecondNode().equals(to)) {
+                return true;
+            }
+        }
+
     	return false;
     }
 
@@ -137,7 +139,20 @@ public class AdjacencyListDirectedGraph {
 	 * Removes the arc (from,to), if it exists. And remove this arc and the inverse in the list of arcs from the two extremities (nodes)
  	 */
     public void removeArc(DirectedNode from, DirectedNode to) {
-    	// A completer
+        Arc arcToRemove = null;
+        for (Arc a : this.arcs) {
+            if (a.getFirstNode().equals(from) && a.getSecondNode().equals(to)) {
+                arcToRemove = a;
+                break;
+            }
+        }
+
+        if (arcToRemove != null) {
+            this.arcs.remove(arcToRemove);
+            from.getArcSucc().removeIf(e -> e.getSecondNode().equals(to));
+            to.getArcPred().removeIf(e -> e.getFirstNode().equals(from));
+            this.nbArcs--;
+        }
     }
 
     /**
@@ -146,7 +161,22 @@ public class AdjacencyListDirectedGraph {
   	* On non-valued graph, every arc has a weight equal to 0.
  	*/
     public void addArc(DirectedNode from, DirectedNode to) {
-    	// A completer
+         if (from == null || to == null) {
+            throw new IllegalArgumentException("Nodes cannot be null.");
+        }
+
+        if (from.equals(to)) {
+            throw new IllegalArgumentException("Cannot add an arc from a node to itself.");
+        }
+
+        Arc a = new Arc(from, to);
+
+        if (!this.arcs.contains(a)) {
+            from.addArc(a);
+            to.addArc(a);
+            this.arcs.add(a);
+            this.nbArcs++;
+        }
     }
 
     //--------------------------------------------------
@@ -164,8 +194,12 @@ public class AdjacencyListDirectedGraph {
      * @return the adjacency matrix representation int[][] of the graph
      */
     public int[][] toAdjacencyMatrix() {
-        int[][] matrix = new int[nbNodes][nbNodes];
-     // A completer
+        int[][] matrix = new int[this.nbNodes][this.nbNodes];
+        for (Arc a : this.arcs) {
+            int i = a.getFirstNode().getLabel();
+            int j = a.getSecondNode().getLabel();
+            matrix[i][j] = 1;
+        }
         return matrix;
     }
 
@@ -173,14 +207,35 @@ public class AdjacencyListDirectedGraph {
 	 * @return a new graph implementing IDirectedGraph interface which is the inverse graph of this
  	 */
     public AdjacencyListDirectedGraph computeInverse() {
-        AdjacencyListDirectedGraph g = new AdjacencyListDirectedGraph(this); // creation of a copy of the current graph. 
-        // A completer
-        return g;
+        AdjacencyListDirectedGraph inverse = new AdjacencyListDirectedGraph();
+        // Add nodes.
+        for (int i = 0; i < this.nbNodes; i++) {
+            inverse.nodes.add(new DirectedNode(i));
+        }
+        inverse.nbNodes = this.nbNodes;
+        
+        // For each arc in the original graph, add its inverse to the new graph.
+        for (Arc arc : this.arcs) {
+            DirectedNode newFrom = inverse.nodes.get(arc.getSecondNode().getLabel());
+            DirectedNode newTo = inverse.nodes.get(arc.getFirstNode().getLabel());
+            
+            // Create new arc with switched direction and same weight.
+            Arc newArc = new Arc(newFrom, newTo, arc.getWeight());
+            newFrom.addArc(newArc);
+            newTo.addArc(newArc);
+            inverse.arcs.add(newArc);
+            inverse.nbArcs++;
+        }
+        
+        return inverse;
     }
     
     @Override
     public String toString(){
     	StringBuilder s = new StringBuilder();
+        s.append("Directed Graph\n");
+        s.append("Number of nodes: ").append(nbNodes).append("\n");
+        s.append("Number of arcs: ").append(nbArcs).append("\n");
         s.append("List of nodes and their successors/predecessors :\n");
         for (DirectedNode n : this.nodes) {
             s.append("\nNode ").append(n).append(" : ");
@@ -203,11 +258,47 @@ public class AdjacencyListDirectedGraph {
     }
 
     public static void main(String[] args) {
-        int[][] Matrix = GraphTools.generateGraphData(10, 20, false, false, false, 100001);
-        GraphTools.afficherMatrix(Matrix);
-        AdjacencyListDirectedGraph al = new AdjacencyListDirectedGraph(Matrix);
-        System.out.println(al);
-        System.out.println("(n_7,n_3) is it in the graph ? " +  al.isArc(al.getNodes().get(7), al.getNodes().get(3)));
-        // A completer
+        int[][] matrix = {
+            {0, 1, 0, 0, 0},
+            {0, 0, 1, 0, 0},
+            {0, 0, 0, 1, 0},
+            {0, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0}
+        };
+
+        System.out.println("Test: Creating a directed graph with a defined matrix.");
+        AdjacencyListDirectedGraph graph = new AdjacencyListDirectedGraph(matrix);
+        System.out.println(graph);
+
+        // Test inverse graph.
+        System.out.println("Computing inverse graph...");
+        AdjacencyListDirectedGraph inverse = graph.computeInverse();
+        System.out.println("Inverse graph:");
+        System.out.println(inverse);
+
+        // Verify some arcs in the inverse graph.
+        boolean hasInverseArc01 = inverse.isArc(graph.getNodes().get(1), graph.getNodes().get(0));
+        System.out.println("Inverse arc (1,0) exists? " + hasInverseArc01 + " (Should be TRUE) " + 
+                         (hasInverseArc01 ? "✅" : "❌"));
+
+        boolean hasInverseArc40 = inverse.isArc(graph.getNodes().get(0), graph.getNodes().get(4));
+        System.out.println("Inverse arc (0,4) exists? " + hasInverseArc40 + " (Should be TRUE) " + 
+                         (hasInverseArc40 ? "✅" : "❌"));
+
+        // Test addArc.
+        System.out.println("Adding arc from node 0 to node 2...");
+        graph.addArc(graph.getNodes().get(0), graph.getNodes().get(2));
+        boolean hasNewArc = graph.getNodes().get(0).getArcSucc().stream()
+            .anyMatch(a -> a.getSecondNode().equals(graph.getNodes().get(2)));
+        System.out.println("Arc (0,2) exists? " + hasNewArc + " (Should be TRUE) " + (hasNewArc ? "✅" : "❌"));
+        System.out.println(graph);
+
+        // Test removeArc.
+        System.out.println("Removing arc from node 0 to node 2...");
+        graph.removeArc(graph.getNodes().get(0), graph.getNodes().get(2));
+        boolean arcRemoved = graph.getNodes().get(0).getArcSucc().stream()
+            .noneMatch(a -> a.getSecondNode().equals(graph.getNodes().get(2)));
+        System.out.println("Arc (0,2) removed? " + arcRemoved + " (Should be TRUE) " + (arcRemoved ? "✅" : "❌"));
+        System.out.println(graph);
     }
 }
