@@ -37,7 +37,9 @@ public class AdjacencyMatrixDirectedGraph {
 		for(int i = 0; i<this.nbNodes; i++){
 			for(int j = 0; j<this.nbNodes; j++){
 				this.matrix[i][j] = mat[i][j];
-				this.nbArcs += mat[i][j];
+				if (i != j && mat[i][j] > 0) {
+					this.nbArcs++;
+				}
 			}
 		}
 	}
