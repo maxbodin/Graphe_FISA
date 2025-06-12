@@ -156,11 +156,15 @@ public class AdjacencyMatrixDirectedGraph {
 
 	/**
 	 * @return a new graph which is the inverse graph of this.matrix
- 	 */
+	 */
 	public AdjacencyMatrixDirectedGraph computeInverse() {
-		AdjacencyMatrixDirectedGraph amInv = new AdjacencyMatrixDirectedGraph(this.matrix);	
-		// A completer
-		return amInv;
+		int[][] inverseMatrix = new int[nbNodes][nbNodes];
+		for (int i = 0; i < nbNodes; i++) {
+			for (int j = 0; j < nbNodes; j++) {
+				inverseMatrix[j][i] = this.matrix[i][j];
+			}
+		}
+		return new AdjacencyMatrixDirectedGraph(inverseMatrix);
 	}
 
 	@Override
@@ -208,5 +212,12 @@ public class AdjacencyMatrixDirectedGraph {
 		am.removeArc(1, 2);
 		System.out.println("After removing arc (1, 2):");
 		System.out.println(am);
+
+		// Test computeInverse
+		System.out.println("\nOriginal graph:");
+		System.out.println(am);
+		AdjacencyMatrixDirectedGraph inverseGraph = am.computeInverse();
+		System.out.println("Inverse graph:");
+		System.out.println(inverseGraph);
 	}
 }
