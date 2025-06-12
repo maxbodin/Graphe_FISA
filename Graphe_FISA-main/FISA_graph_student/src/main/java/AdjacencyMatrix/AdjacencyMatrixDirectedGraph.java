@@ -164,7 +164,7 @@ public class AdjacencyMatrixDirectedGraph {
 
 	@Override
 	public String toString() {
-		StringBuilder s = new StringBuilder("\nDirected Adjacency Matrix:\n    ");
+		StringBuilder s = new StringBuilder("\nAdjacency Matrix Directed Graph:\n    ");
 
 		// Column headers.
 		for (int i = 0; i < nbNodes; i++) {

@@ -41,7 +41,7 @@ public class AdjacencyMatrixUndirectedValuedGraph extends AdjacencyMatrixUndirec
 
 	@Override
 	public String toString() {
-		StringBuilder s = new StringBuilder("\nMatrix of Costs:\n    ");
+		StringBuilder s = new StringBuilder("\nAdjacency Matrix Undirected Valued Graph:\n    ");
 
 		// Column headers.
 		for (int i = 0; i < nbNodes; i++) {

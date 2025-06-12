@@ -196,7 +196,7 @@ public class AdjacencyMatrixUndirectedGraph {
 
 	@Override
 	public String toString() {
-		StringBuilder s = new StringBuilder("\nAdjacency Matrix:\n    ");
+		StringBuilder s = new StringBuilder("\nAdjacency Matrix Undirected Graph:\n    ");
 
 		// Column headers.
 		for (int i = 0; i < nbNodes; i++) {
