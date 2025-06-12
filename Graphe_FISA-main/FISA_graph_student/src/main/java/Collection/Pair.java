@@ -28,7 +28,7 @@ public class Pair<A, B> {
 		if (!(o instanceof Pair)) {
 			return false;
 		}
-		Pair pairo = (Pair) o;
+		Pair<?, ?> pairo = (Pair<?, ?>) o;
 		return this.left.equals(pairo.getLeft()) && this.right.equals(pairo.getRight());
 	}
 

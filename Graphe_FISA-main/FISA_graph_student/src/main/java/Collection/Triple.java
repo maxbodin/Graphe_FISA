@@ -48,10 +48,10 @@ public class Triple<A, B, C> {
 
 	@Override
 	public boolean equals(Object o) {
-		if (!(o instanceof Triple)) {
+		if (!(o instanceof Triple<?, ?, ?>)) {
 			return false;
 		}
-		Triple triplo = (Triple) o;
+		Triple<?, ?, ?> triplo = (Triple<?, ?, ?>) o;
 		return this.first.equals(triplo.getFirst())
 			&& this.second.equals(triplo.getSecond())
 			&& this.third.equals(triplo.getThird());
