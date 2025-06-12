@@ -66,7 +66,7 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 	}
 
 	public static void main(String[] args) {
-        int[][] definedMatrix = {
+        int[][] matrix = {
             {0, 3, 0, 4, 0},
             {0, 0, 2, 0, 0},
             {0, 0, 0, 5, 1},
@@ -74,7 +74,7 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
             {0, 7, 0, 0, 0}
         };
         System.out.println("Test 1: Creating a directed valued graph with defined matrix.");
-        AdjacencyMatrixDirectedValuedGraph graph = new AdjacencyMatrixDirectedValuedGraph(definedMatrix);
+        AdjacencyMatrixDirectedValuedGraph graph = new AdjacencyMatrixDirectedValuedGraph(matrix);
         System.out.println(graph);
         System.out.println("Number of nodes = " + graph.getNbNodes() + " (Should be 5) " + (graph.getNbNodes() == 5 ? "✅" : "❌"));
         System.out.println("Number of arcs = " + graph.getNbArcs() + " (Should be 7) " + (graph.getNbArcs() == 7 ? "✅" : "❌"));

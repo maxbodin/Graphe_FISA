@@ -1,12 +1,10 @@
 package AdjacencyList;
 
-import java.util.ArrayList;
-
-import GraphAlgorithms.GraphTools;
+import Nodes_Edges.Arc;
 import Nodes_Edges.Edge;
 import Nodes_Edges.UndirectedNode;
 
-public class AdjacencyListUndirectedValuedGraph extends AdjacencyListUndirectedGraph{
+public class AdjacencyListUndirectedValuedGraph extends AdjacencyListUndirectedGraph {
 
 	//--------------------------------------------------
     // 				Constructors
@@ -43,17 +41,80 @@ public class AdjacencyListUndirectedValuedGraph extends AdjacencyListUndirectedG
      * And adds this edge to the incident list of both extremities (nodes) and into the global list "edges" of the graph.
      */
     public void addEdge(UndirectedNode x, UndirectedNode y, int cost) {
-    	// A completer
+        if (x == null || y == null) {
+            throw new IllegalArgumentException("Nodes cannot be null");
+        }
+
+        if (x.equals(y)) {
+            throw new IllegalArgumentException("Cannot add an edge from a node to itself");
+        }
+
+        // Find existing arc by direct search
+        for (Edge edge : this.edges) {
+            if (edge.getFirstNode().equals(x) && edge.getSecondNode().equals(y)) {
+                edge.setWeight(cost);
+                return;
+            }
+        }
+
+        // If no existing edge found, create new ones.
+        Edge e1 = new Edge(x, y, cost);
+        Edge e2 = new Edge(y, x, cost);
+        x.addEdge(e1);
+        y.addEdge(e2);
+        this.edges.add(e1);
+        this.nbEdges++;
     }
-    
-    
-    
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("Undirected Valued Graph\n");
+        s.append("Number of nodes: ").append(nbNodes).append("\n");
+        s.append("Number of edges: ").append(nbEdges).append("\n\n");
+        s.append("List of nodes and their neighbours :\n");
+        for (UndirectedNode n : this.nodes) {
+            s.append("Node ").append(n.getLabel()).append(" -> ");
+            for (Edge e : n.getIncidentEdges()) {
+                s.append("(").append(e.getSecondNode().getLabel()).append(", weight=").append(e.getWeight()).append(") ");
+            }
+            s.append("\n");
+        }
+        s.append("\nList of edges :\n");
+        for (Edge e : this.edges) {
+            s.append(e).append("  ");
+        }
+        s.append("\n");
+        return s.toString();
+    }
+
     public static void main(String[] args) {
-        int[][] matrixValued = GraphTools.generateValuedGraphData(10, false, true, true, false, 100001);
-        GraphTools.afficherMatrix(matrixValued);
-        AdjacencyListUndirectedValuedGraph al = new AdjacencyListUndirectedValuedGraph(matrixValued);
-        System.out.println(al);
-        System.out.println("Does edge (n_5,n_6) exist ? "+ al.getEdges().contains(new Edge(al.getNodes().get(6),al.getNodes().get(5))));
-        // A completer
+        int[][] matrix = {
+            {0, 3, 0, 4, 0},
+            {3, 0, 2, 0, 0},
+            {0, 2, 0, 5, 1},
+            {4, 0, 5, 0, 6},
+            {0, 0, 1, 6, 0}
+        };
+
+        System.out.println("Test: Creating an undirected valued graph with a defined matrix.");
+        AdjacencyListUndirectedValuedGraph graph = new AdjacencyListUndirectedValuedGraph(matrix);
+        System.out.println(graph);
+
+        // Test addEdge.
+        System.out.println("Adding edge between node 0 and node 2 with weight 8...");
+        graph.addEdge(graph.getNodes().get(0), graph.getNodes().get(2), 8);
+        boolean hasNewEdge = graph.getNodes().get(0).getIncidentEdges().stream()
+            .anyMatch(e -> e.getSecondNode().equals(graph.getNodes().get(2)) && e.getWeight() == 8);
+        System.out.println("Edge (0,2) with weight 8 exists? " + hasNewEdge + " (Should be TRUE) " + (hasNewEdge ? "✅" : "❌"));
+        System.out.println(graph);
+
+        // Test updateEdge.
+        System.out.println("Updating edge between node 0 and node 1 with new weight 9...");
+        graph.addEdge(graph.getNodes().get(0), graph.getNodes().get(1), 9);
+        boolean costUpdated = graph.getNodes().get(0).getIncidentEdges().stream()
+            .anyMatch(e -> e.getSecondNode().equals(graph.getNodes().get(1)) && e.getWeight() == 9);
+        System.out.println("Edge (0,1) updated to weight 9? " + costUpdated + " (Should be TRUE) " + (costUpdated ? "✅" : "❌"));
+        System.out.println(graph);
     }
 }

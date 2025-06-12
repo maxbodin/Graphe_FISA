@@ -192,7 +192,7 @@ public class AdjacencyMatrixDirectedGraph {
 	}
 
 	public static void main(String[] args) {
-        int[][] definedMatrix = {
+        int[][] matrix = {
             {0, 1, 0, 1, 0},
             {0, 0, 1, 0, 0},
             {0, 0, 0, 1, 1},
@@ -200,7 +200,7 @@ public class AdjacencyMatrixDirectedGraph {
             {0, 1, 0, 0, 0}
         };
         System.out.println("Test 1: Creating a directed graph with defined matrix.");
-        AdjacencyMatrixDirectedGraph graph = new AdjacencyMatrixDirectedGraph(definedMatrix);
+        AdjacencyMatrixDirectedGraph graph = new AdjacencyMatrixDirectedGraph(matrix);
         System.out.println(graph);
         System.out.println("Number of nodes = " + graph.getNbNodes() + " (Should be 5) " + (graph.getNbNodes() == 5 ? "✅" : "❌"));
         System.out.println("Number of arcs = " + graph.getNbArcs() + " (Should be 7) " + (graph.getNbArcs() == 7 ? "✅" : "❌"));

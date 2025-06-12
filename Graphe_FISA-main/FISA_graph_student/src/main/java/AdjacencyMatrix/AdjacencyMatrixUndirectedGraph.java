@@ -222,8 +222,7 @@ public class AdjacencyMatrixUndirectedGraph {
 	}
 
 	public static void main(String[] args) {
-        // Test 1: Create a graph with a defined matrix.
-        int[][] definedMatrix = {
+        int[][] matrix = {
             {0, 1, 0, 1, 0},
             {1, 0, 1, 0, 0},
             {0, 1, 0, 1, 1},
@@ -231,7 +230,7 @@ public class AdjacencyMatrixUndirectedGraph {
             {0, 0, 1, 1, 0}
         };
         System.out.println("Test 1: Creating a graph with defined matrix.");
-        AdjacencyMatrixUndirectedGraph graph = new AdjacencyMatrixUndirectedGraph(definedMatrix);
+        AdjacencyMatrixUndirectedGraph graph = new AdjacencyMatrixUndirectedGraph(matrix);
         System.out.println(graph);
         System.out.println("Number of nodes = " + graph.getNbNodes() + " (Should be 5) " + (graph.getNbNodes() == 5 ? "✅" : "❌"));
         System.out.println("Number of edges = " + graph.getNbEdges() + " (Should be 6) " + (graph.getNbEdges() == 6 ? "✅" : "❌"));
