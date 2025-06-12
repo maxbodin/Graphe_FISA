@@ -3,7 +3,6 @@ package AdjacencyList;
 import java.util.ArrayList;
 import java.util.List;
 
-import GraphAlgorithms.GraphTools;
 import Nodes_Edges.Edge;
 import Nodes_Edges.UndirectedNode;
 
@@ -119,18 +118,27 @@ public class AdjacencyListUndirectedGraph {
     /**
      * @return true if there is an edge between x and y
      */
-    public boolean isEdge(UndirectedNode x, UndirectedNode y) {      	
-        // A completer
-    	return true;
+    public boolean isEdge(UndirectedNode x, UndirectedNode y) {
+        for (Edge e : this.edges) {
+            if ((e.getFirstNode().equals(x) && e.getSecondNode().equals(y)) ||
+                (e.getFirstNode().equals(y) && e.getSecondNode().equals(x))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * Removes edge (x,y) if there exists one. And remove this edge and the inverse in the list of edges from the two extremities (nodes)
      */
     public void removeEdge(UndirectedNode x, UndirectedNode y) {
-    	if(isEdge(x,y)){
-    		// A completer
-    	}
+        this.edges.removeIf(e ->
+            (e.getFirstNode().equals(x) && e.getSecondNode().equals(y)) ||
+            (e.getFirstNode().equals(y) && e.getSecondNode().equals(x))
+        );
+        x.getIncidentEdges().removeIf(e -> e.getSecondNode().equals(y));
+        y.getIncidentEdges().removeIf(e -> e.getSecondNode().equals(x));
+        this.nbEdges--;
     }
 
     /**
@@ -139,16 +147,18 @@ public class AdjacencyListUndirectedGraph {
      * In non-valued graph, every edge has a cost equal to 0.
      */
     public void addEdge(UndirectedNode x, UndirectedNode y) {
-    	if(!isEdge(x,y)){
-    		// A completer
-    	}
+        if (!isEdge(x, y)) {
+            Edge edge = new Edge(x, y);
+            this.edges.add(edge);
+            x.addEdge(edge);
+            y.addEdge(new Edge(y, x));
+            this.nbEdges++;
+        }
     }
 
     //--------------------------------------------------
     // 					Methods
     //--------------------------------------------------
-    
-    
 
     /**
      * @return the corresponding nodes in the list this.nodes
@@ -161,40 +171,77 @@ public class AdjacencyListUndirectedGraph {
      * @return a matrix representation of the graph 
      */
     public int[][] toAdjacencyMatrix() {
-        int[][] matrix = new int[nbNodes][nbNodes];
-        // A completer
+        int[][] matrix = new int[this.nbNodes][this.nbNodes];
+        for (Edge e : this.edges) {
+            int i = e.getFirstNode().getLabel();
+            int j = e.getSecondNode().getLabel();
+            matrix[i][j] = 1;
+            matrix[j][i] = 1; // Symmetric for undirected graph.
+        }
         return matrix;
     }
 
-    
     public String toString() {
         StringBuilder s = new StringBuilder();
+        s.append("Undirected Graph\n");
+        s.append("Number of nodes: ").append(nbNodes).append("\n");
+        s.append("Number of edges: ").append(nbEdges).append("\n");
         s.append("List of nodes and their neighbours :\n");
         for (UndirectedNode n : this.nodes) {
-            s.append("Node ").append(n).append(" : ");
-            s.append("\nList of incident edges : ");
+            s.append("Node ").append(n.getLabel()).append(" -> ");
             for (Edge e : n.getIncidentEdges()) {
-                s.append(e).append("  ");
+                s.append("(").append(e.getSecondNode().getLabel()).append(", weight=").append(e.getWeight()).append(") ");
             }
-            s.append("\n");            
+            s.append("\n");
         }
         s.append("\nList of edges :\n");
         for (Edge e : this.edges) {
-        	s.append(e).append("  ");
+            s.append(e).append("  ");
         }
         s.append("\n");
         return s.toString();
     }
 
     public static void main(String[] args) {
-        int[][] mat = GraphTools.generateGraphData(10, 20, false, true, false, 100001);
-        GraphTools.afficherMatrix(mat);
-        AdjacencyListUndirectedGraph al = new AdjacencyListUndirectedGraph(mat);
-        System.out.println(al);        
-        System.out.println("(n_2,n_5) is it in the graph ? " +  al.isEdge(al.getNodes().get(2), al.getNodes().get(5)));
-        
-        
-        // A completer
-    }
+        int[][] matrix = {
+            {0, 1, 0, 0, 0},
+            {1, 0, 1, 0, 0},
+            {0, 1, 0, 1, 0},
+            {0, 0, 1, 0, 1},
+            {0, 0, 0, 1, 0}
+        };
 
+        System.out.println("Test: Creating an undirected graph with a defined matrix.");
+        AdjacencyListUndirectedGraph graph = new AdjacencyListUndirectedGraph(matrix);
+        System.out.println(graph);
+
+        // Test isEdge.
+        System.out.println("Testing edge existence between node 0 and node 1:");
+        boolean edge01 = graph.isEdge(graph.getNodes().get(0), graph.getNodes().get(1));
+        System.out.println("Edge (0,1) exists? " + edge01 + " (Should be TRUE) " + (edge01 ? "✅" : "❌"));
+
+        // Test addEdge.
+        System.out.println("Adding edge between node 0 and node 4...");
+        graph.addEdge(graph.getNodes().get(0), graph.getNodes().get(4));
+        boolean edge04 = graph.isEdge(graph.getNodes().get(0), graph.getNodes().get(4));
+        System.out.println("Edge (0,4) exists? " + edge04 + " (Should be TRUE) " + (edge04 ? "✅" : "❌"));
+        System.out.println(graph);
+
+        // Test removeEdge.
+        System.out.println("Removing edge between node 0 and node 4...");
+        graph.removeEdge(graph.getNodes().get(0), graph.getNodes().get(4));
+        boolean edge04Supp = graph.isEdge(graph.getNodes().get(0), graph.getNodes().get(4));
+        System.out.println("Edge (0,4) exists after removal? " + edge04Supp + " (Should be FALSE) " + (!edge04Supp ? "✅" : "❌"));
+        System.out.println(graph);
+
+        // Test toAdjacencyMatrix.
+        System.out.println("Adjacency matrix:");
+        int[][] adjacencyMatrix = graph.toAdjacencyMatrix();
+        for (int[] row : adjacencyMatrix) {
+            for (int val : row) {
+                System.out.print(val + " ");
+            }
+            System.out.println();
+        }
+    }
 }
