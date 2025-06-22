@@ -77,8 +77,8 @@ public class GraphToolsList extends GraphTools {
 	}
 
 
-	public static void explorerGraphe(AdjacencyListDirectedGraph al, int s) {
-		Set<DirectedNode> atteint = new HashSet<DirectedNode>();
+	public static void explorerGraphe(AdjacencyListDirectedGraph al) {
+		Set<DirectedNode> atteint = new HashSet<>();
 		int nbNodes = al.getNbNodes();
 		visite = new int[nbNodes];
 		cpt = 0;
@@ -130,7 +130,7 @@ public class GraphToolsList extends GraphTools {
 	}
 
 	public static void explorerGrapheBis(AdjacencyListDirectedGraph al, List<Integer> ordreFin) {
-		Set<DirectedNode> atteint = new HashSet<DirectedNode>();
+		Set<DirectedNode> atteint = new HashSet<>();
 		List<DirectedNode> ordreFinDirectedNodes = new ArrayList<>();
 		List<DirectedNode> nodes = al.getNodes(); // Tous les noeuds, indexés par label
 		for (Integer label : ordreFin) {
@@ -158,7 +158,7 @@ public class GraphToolsList extends GraphTools {
         System.out.println("Parcours en profondeur (DFS) départ 0 (par défaut)");
 		// Question 13 (Kosaraju):
 		// 1. Premier en profondeur en notant l’ordre de fin d’exploration des sommets visités
-        explorerGraphe(al, 0);
+        explorerGraphe(al);
         // 2. Refaire un DFS
         order_CC = getOrdreFinDecroissant(); //en suivant cet ordre de manière inversé
 		System.out.println("Ordre inverse des sommets complètement explorés");
@@ -186,7 +186,7 @@ public class GraphToolsList extends GraphTools {
 		AdjacencyListDirectedGraph al2 = new AdjacencyListDirectedGraph(matrix);
 		System.out.println(al2.getArcs());
 
-		explorerGraphe(al2, 0);
+		explorerGraphe(al2);
 		// 2. Refaire un DFS
 		order_CC = getOrdreFinDecroissant(); //en suivant cet ordre de manière inversé
 		System.out.println("Ordre de fin inversé : " + order_CC);
