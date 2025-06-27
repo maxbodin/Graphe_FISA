@@ -1,6 +1,5 @@
 package GraphAlgorithms;
 
-
 public class BinaryHeap {
 
     private int[] nodes;
@@ -131,7 +130,7 @@ public class BinaryHeap {
         BinaryHeap jarjarBin = new BinaryHeap();
         System.out.println("Tas binaire vide? " + jarjarBin.isEmpty() + "\n");
         
-        System.out.println("=== Tests d'insertion (Question 4) ===");
+        System.out.println("=== Tests d'insertion ===");
         int[] valuesToInsert = {4, 10, 8, 6, 3};
         
         for (int val : valuesToInsert) {
@@ -146,7 +145,7 @@ public class BinaryHeap {
         System.out.println("Tas final: " + jarjarBin);
         System.out.println("Tas valide? " + jarjarBin.test());
         
-        System.out.println("\n=== Tests de suppression (Question 7) ===");
+        System.out.println("\n=== Tests de suppression ===");
         System.out.println("Première suppression:");
         int removed1 = jarjarBin.remove();
         System.out.println("Élément supprimé: " + removed1);
@@ -163,5 +162,4 @@ public class BinaryHeap {
         System.out.println("Complexité insertion: O(log n) - remontée dans l'arbre");
         System.out.println("Complexité suppression: O(log n) - descente dans l'arbre");
     }
-
 }

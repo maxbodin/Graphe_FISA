@@ -2,7 +2,6 @@ package AdjacencyMatrix;
 
 import java.util.List;
 
-
 public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedGraph {
 
 	//--------------------------------------------------
@@ -38,26 +37,22 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 	}
 
 	/**
-	 * Question 1: Implémentation de l'algorithme de Dijkstra
 	 * 
-	 * @param s sommet source (point de départ)
+	 * @param s source vertex (starting point)
 	 */
 	public void dijkstra(int s) {
 		int n = this.nbNodes;
 		
-		// Ligne 1: Initialisation des structures de données
 		boolean[] mark = new boolean[n];
 		int[] val = new int[n];
 		Integer[] pred = new Integer[n];
 		
-		// Lignes 2-4: Initialisation des valeurs
 		for (int v = 0; v < n; v++) {
 			mark[v] = false;
-			val[v] = Integer.MAX_VALUE / 2; // MaxInt/2 pour éviter les débordements
+			val[v] = Integer.MAX_VALUE / 2;
 			pred[v] = null;
 		}
 		
-		// Ligne 5: Initialisation du sommet source
 		val[s] = 0;
 		pred[s] = s;
 		
@@ -65,11 +60,9 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 		System.out.println("Initialisation:");
 		afficherEtat(mark, val, pred);
 		
-		// Ligne 6: Boucle principale tant qu'il reste des sommets non marqués
 		while (true) {
 			int x = -1;
 			
-			// Lignes 8-14: Recherche du sommet x non marqué de val minimum
 			int min = Integer.MAX_VALUE / 2;
 			for (int y = 0; y < n; y++) {
 				if (!mark[y] && val[y] < min) {
@@ -78,18 +71,15 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 				}
 			}
 			
-			// Ligne 16: Si aucun sommet atteignable trouvé, arrêter
 			if (min >= Integer.MAX_VALUE / 2 || x == -1) {
 				break;
 			}
 			
-			// Ligne 17: Marquer le sommet choisi
 			mark[x] = true;
 			System.out.println("\nTraitement du sommet " + x + " (distance: " + val[x] + ")");
 			
-			// Lignes 18-22: Mise à jour des successeurs non fixés de x
 			for (int y = 0; y < n; y++) {
-				if (!mark[y] && matrix[x][y] > 0) { // il y a un arc de x vers y
+				if (!mark[y] && matrix[x][y] > 0) {
 					int nouveauCost = val[x] + matrix[x][y];
 					if (nouveauCost < val[y]) {
 						val[y] = nouveauCost;
@@ -104,7 +94,6 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 			afficherEtat(mark, val, pred);
 		}
 		
-		// Affichage final des résultats
 		System.out.println("\n=== Résultats finaux ===");
 		System.out.println("Distances depuis le sommet " + s + ":");
 		for (int v = 0; v < n; v++) {
@@ -116,7 +105,6 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 			}
 		}
 		
-		// Affichage des chemins
 		System.out.println("\nChemins optimaux:");
 		for (int v = 0; v < n; v++) {
 			if (v != s && val[v] != Integer.MAX_VALUE / 2) {
@@ -175,19 +163,16 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 	public String toString() {
 		StringBuilder s = new StringBuilder("\nAdjacency Matrix Directed Valued Graph:\n    ");
 
-		// Column headers.
 		for (int i = 0; i < nbNodes; i++) {
 			s.append(String.format("%3d", i));
 		}
 		s.append("\n   ");
 
-		// Separator line.
 		for (int i = 0; i < 3 * nbNodes; i++) {
 			s.append("-");
 		}
 		s.append("\n");
 
-		// Matrix rows with row indices.
 		for (int i = 0; i < nbNodes; i++) {
 			s.append(String.format("%2d |", i));
 			for (int j = 0; j < nbNodes; j++) {
@@ -204,7 +189,6 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 	public static void main(String[] args) {
 		System.out.println("=== Tests de l'algorithme de Dijkstra ===\n");
 		
-		// Test 1: Graphe orienté simple
 		System.out.println("--- Test 1: Graphe orienté simple ---");
 		int[][] matrix1 = {
 			{0, 4, 2, 0, 0},
