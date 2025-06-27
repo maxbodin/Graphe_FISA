@@ -27,34 +27,72 @@ public class BinaryHeap {
         return pos == 0;
     }
 
-    public void insert(int element) {
-    	// A completer
+    public boolean insert(int element) {
+        if (pos >= nodes.length) {
+            resize();
+        }
+        
+        nodes[pos] = element;
+        
+        int currentIndex = pos;
+        while (currentIndex > 0) {
+            int parentIndex = (currentIndex - 1) / 2;
+            if (nodes[parentIndex] <= nodes[currentIndex]) {
+                break;
+            }
+            swap(parentIndex, currentIndex);
+            currentIndex = parentIndex;
+        }
+        
+        pos++;
+        return true;
     }
 
     public int remove() {
-    	// A completer
-    	return 0;
+        if (isEmpty()) {
+            return Integer.MAX_VALUE;
+        }
+        
+        int removedElement = nodes[0];
+        
+        pos--;
+        nodes[0] = nodes[pos];
+        nodes[pos] = Integer.MAX_VALUE;
+        
+        int currentIndex = 0;
+        while (!isLeaf(currentIndex)) {
+            int bestChildIndex = getBestChildPos(currentIndex);
+            if (bestChildIndex == Integer.MAX_VALUE || nodes[currentIndex] <= nodes[bestChildIndex]) {
+                break;
+            }
+            swap(currentIndex, bestChildIndex);
+            currentIndex = bestChildIndex;
+        }
+        
+        return removedElement;
     }
 
     private int getBestChildPos(int src) {
-        if (isLeaf(src)) { // the leaf is a stopping case, then we return a default value
+        if (isLeaf(src)) {
             return Integer.MAX_VALUE;
         } else {
-        	// A completer
-        	return Integer.MAX_VALUE;
+            int leftChildIndex = 2 * src + 1;
+            int rightChildIndex = 2 * src + 2;
+            
+            if (rightChildIndex >= pos) {
+                return leftChildIndex;
+            }
+            
+            if (nodes[leftChildIndex] <= nodes[rightChildIndex]) {
+                return leftChildIndex;
+            } else {
+                return rightChildIndex;
+            }
         }
     }
 
-    
-    /**
-	 * Test if the node is a leaf in the binary heap
-	 * 
-	 * @returns true if it's a leaf or false else
-	 * 
-	 */	
     private boolean isLeaf(int src) {
-    	// A completer
-    	return false;
+        return (2 * src + 1) >= pos;
     }
 
     private void swap(int father, int child) {
@@ -71,12 +109,6 @@ public class BinaryHeap {
         return s.toString();
     }
 
-    /**
-	 * Recursive test to check the validity of the binary heap
-	 * 
-	 * @returns a boolean equal to True if the binary tree is compact from left to right
-	 * 
-	 */
     public boolean test() {
         return this.isEmpty() || testRec(0);
     }
@@ -97,20 +129,39 @@ public class BinaryHeap {
 
     public static void main(String[] args) {
         BinaryHeap jarjarBin = new BinaryHeap();
-        System.out.println(jarjarBin.isEmpty()+"\n");
-        int k = 20;
-        int m = k;
-        int min = 2;
-        int max = 20;
-        while (k > 0) {
-            int rand = min + (int) (Math.random() * ((max - min) + 1));
-            System.out.print("insert " + rand);
-            jarjarBin.insert(rand);            
-            k--;
+        System.out.println("Tas binaire vide? " + jarjarBin.isEmpty() + "\n");
+        
+        System.out.println("=== Tests d'insertion (Question 4) ===");
+        int[] valuesToInsert = {4, 10, 8, 6, 3};
+        
+        for (int val : valuesToInsert) {
+            System.out.println("Insertion de " + val);
+            boolean success = jarjarBin.insert(val);
+            System.out.println("Succès: " + success);
+            System.out.println("Tas après insertion: " + jarjarBin);
+            System.out.println("Tas valide? " + jarjarBin.test());
+            System.out.println();
         }
-     // A completer
-        System.out.println("\n" + jarjarBin);
-        System.out.println(jarjarBin.test());
+        
+        System.out.println("Tas final: " + jarjarBin);
+        System.out.println("Tas valide? " + jarjarBin.test());
+        
+        System.out.println("\n=== Tests de suppression (Question 7) ===");
+        System.out.println("Première suppression:");
+        int removed1 = jarjarBin.remove();
+        System.out.println("Élément supprimé: " + removed1);
+        System.out.println("Tas après suppression: " + jarjarBin);
+        System.out.println("Tas valide? " + jarjarBin.test());
+        
+        System.out.println("\nDeuxième suppression:");
+        int removed2 = jarjarBin.remove();
+        System.out.println("Élément supprimé: " + removed2);
+        System.out.println("Tas après suppression: " + jarjarBin);
+        System.out.println("Tas valide? " + jarjarBin.test());
+        
+        System.out.println("\n=== Complexité ===");
+        System.out.println("Complexité insertion: O(log n) - remontée dans l'arbre");
+        System.out.println("Complexité suppression: O(log n) - descente dans l'arbre");
     }
 
 }

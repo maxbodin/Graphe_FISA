@@ -30,8 +30,26 @@ public class BinaryHeapEdge {
 	 * @param to one node of the edge
 	 * @param val the edge weight
 	 */
-    public void insert(UndirectedNode from, UndirectedNode to, int val) {
-    	// To complete
+    public boolean insert(UndirectedNode from, UndirectedNode to, int val) {
+        // Créer une nouvelle arête
+        Edge newEdge = new Edge(from, to, val);
+        
+        // Ajouter l'arête à la fin de la liste (première feuille disponible)
+        binh.add(newEdge);
+        
+        // Remonter l'arête jusqu'à rencontrer un parent de poids plus petit ou égal
+        int currentIndex = binh.size() - 1;
+        while (currentIndex > 0) {
+            int parentIndex = (currentIndex - 1) / 2;
+            if (binh.get(parentIndex).getWeight() <= binh.get(currentIndex).getWeight()) {
+                break; // Le parent a un poids plus petit ou égal, on s'arrête
+            }
+            // Sinon, on échange avec le parent
+            swap(parentIndex, currentIndex);
+            currentIndex = parentIndex;
+        }
+        
+        return true;
     }
 
     
@@ -42,9 +60,34 @@ public class BinaryHeapEdge {
 	 * 
 	 */
     public Edge remove() {
-    	// To complete
-    	return null;
+        if (isEmpty()) {
+            return null;
+        }
         
+        // Sauvegarder l'arête à retourner (racine = minimum)
+        Edge removedEdge = binh.get(0);
+        
+        // Permuter la racine avec la dernière feuille utilisée
+        Edge lastEdge = binh.get(binh.size() - 1);
+        binh.set(0, lastEdge);
+        binh.remove(binh.size() - 1); // Retirer la dernière arête
+        
+        // Si le tas n'est pas vide, descendre l'élément
+        if (!isEmpty()) {
+            int currentIndex = 0;
+            while (!isLeaf(currentIndex)) {
+                int bestChildIndex = getBestChildPos(currentIndex);
+                if (bestChildIndex == Integer.MAX_VALUE || 
+                    binh.get(currentIndex).getWeight() <= binh.get(bestChildIndex).getWeight()) {
+                    break; // L'arête est à la bonne position
+                }
+                // Sinon, échanger avec le meilleur fils
+                swap(currentIndex, bestChildIndex);
+                currentIndex = bestChildIndex;
+            }
+        }
+        
+        return removedEdge;
     }
     
 
@@ -59,14 +102,26 @@ public class BinaryHeapEdge {
         if (isLeaf(src)) { // the leaf is a stopping case, then we return a default value
             return Integer.MAX_VALUE;
         } else {
-        	// To complete
-        	return Integer.MAX_VALUE;
+            int leftChildIndex = 2 * src + 1;
+            int rightChildIndex = 2 * src + 2;
+            
+            // Si le nœud n'a qu'un seul fils (gauche)
+            if (rightChildIndex > lastIndex) {
+                return leftChildIndex;
+            }
+            
+            // Sinon, retourner l'index du fils ayant le plus petit poids
+            if (binh.get(leftChildIndex).getWeight() <= binh.get(rightChildIndex).getWeight()) {
+                return leftChildIndex;
+            } else {
+                return rightChildIndex;
+            }
         }
     }
 
     private boolean isLeaf(int src) {
-    	// A completer
-    	return false;
+        // Un nœud est une feuille si son premier fils gauche dépasse la taille du tas
+        return (2 * src + 1) >= binh.size();
     }
 
     
@@ -77,13 +132,10 @@ public class BinaryHeapEdge {
 	 * @param child an index of the list edges
 	 */
     private void swap(int father, int child) {         
-    	Edge temp = binh.get(father);
-    	binh.get(father).setFirstNode(binh.get(child).getFirstNode());
-    	binh.get(father).setSecondNode(binh.get(child).getSecondNode());
-    	binh.get(father).setWeight(binh.get(child).getWeight());
-    	binh.get(child).setFirstNode(temp.getFirstNode());
-    	binh.get(child).setSecondNode(temp.getSecondNode());
-    	binh.get(child).setWeight(temp.getWeight());
+        // Méthode corrigée : échanger les positions dans la liste plutôt que les contenus
+        Edge temp = binh.get(father);
+        binh.set(father, binh.get(child));
+        binh.set(child, temp);
     }
 
     
@@ -157,7 +209,7 @@ public class BinaryHeapEdge {
             int right = 2 * root + 2;
             System.out.println("left = "+left);
             System.out.println("right = "+right);
-            if (right >= lastIndex) {
+            if (right > lastIndex) {
                 return binh.get(left).getWeight() >= binh.get(root).getWeight() && testRec(left);
             } else {
                 return binh.get(left).getWeight() >= binh.get(root).getWeight() && testRec(left)
@@ -168,19 +220,42 @@ public class BinaryHeapEdge {
 
     public static void main(String[] args) {
         BinaryHeapEdge jarjarBin = new BinaryHeapEdge();
-        System.out.println(jarjarBin.isEmpty()+"\n");
-        int k = 10;
-        int m = k;
-        int min = 2;
-        int max = 20;
-        while (k > 0) {
-            int rand = min + (int) (Math.random() * ((max - min) + 1));                        
-            jarjarBin.insert(new UndirectedNode(k), new UndirectedNode(k+30), rand);            
-            k--;
+        System.out.println("Tas binaire d'arêtes vide? " + jarjarBin.isEmpty() + "\n");
+        
+        // Tests d'insertion avec des arêtes
+        System.out.println("=== Tests d'insertion d'arêtes ===");
+        int[] weights = {4, 10, 8, 6, 3, 15, 7};
+        
+        for (int i = 0; i < weights.length; i++) {
+            UndirectedNode from = new UndirectedNode(i);
+            UndirectedNode to = new UndirectedNode(i + 10);
+            System.out.println("Insertion d'arête avec poids " + weights[i]);
+            jarjarBin.insert(from, to, weights[i]);
+            System.out.println("Tas après insertion: " + jarjarBin);
+            System.out.println("Tas valide? " + jarjarBin.test());
+            System.out.println();
         }
-        // A completer
-        System.out.println(jarjarBin);
-        System.out.println(jarjarBin.test());
+        
+        System.out.println("Tas final: " + jarjarBin);
+        
+        // Tests de suppression
+        System.out.println("\n=== Tests de suppression ===");
+        for (int i = 0; i < 3; i++) {
+            System.out.println("Suppression " + (i + 1) + ":");
+            Edge removed = jarjarBin.remove();
+            if (removed != null) {
+                System.out.println("Arête supprimée: " + removed + " (poids: " + removed.getWeight() + ")");
+                System.out.println("Tas après suppression: " + jarjarBin);
+                System.out.println("Tas valide? " + jarjarBin.test());
+            } else {
+                System.out.println("Tas vide!");
+            }
+            System.out.println();
+        }
+        
+        System.out.println("=== Complexité ===");
+        System.out.println("Complexité insertion: O(log n) - remontée dans l'arbre");
+        System.out.println("Complexité suppression: O(log n) - descente dans l'arbre");
     }
 
 }

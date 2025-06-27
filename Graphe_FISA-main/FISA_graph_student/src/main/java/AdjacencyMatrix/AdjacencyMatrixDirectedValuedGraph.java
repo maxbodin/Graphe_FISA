@@ -37,6 +37,139 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 		}
 	}
 
+	/**
+	 * Question 1: Implémentation de l'algorithme de Dijkstra
+	 * 
+	 * @param s sommet source (point de départ)
+	 */
+	public void dijkstra(int s) {
+		int n = this.nbNodes;
+		
+		// Ligne 1: Initialisation des structures de données
+		boolean[] mark = new boolean[n];
+		int[] val = new int[n];
+		Integer[] pred = new Integer[n];
+		
+		// Lignes 2-4: Initialisation des valeurs
+		for (int v = 0; v < n; v++) {
+			mark[v] = false;
+			val[v] = Integer.MAX_VALUE / 2; // MaxInt/2 pour éviter les débordements
+			pred[v] = null;
+		}
+		
+		// Ligne 5: Initialisation du sommet source
+		val[s] = 0;
+		pred[s] = s;
+		
+		System.out.println("=== Algorithme de Dijkstra depuis le sommet " + s + " ===");
+		System.out.println("Initialisation:");
+		afficherEtat(mark, val, pred);
+		
+		// Ligne 6: Boucle principale tant qu'il reste des sommets non marqués
+		while (true) {
+			int x = -1;
+			
+			// Lignes 8-14: Recherche du sommet x non marqué de val minimum
+			int min = Integer.MAX_VALUE / 2;
+			for (int y = 0; y < n; y++) {
+				if (!mark[y] && val[y] < min) {
+					x = y;
+					min = val[y];
+				}
+			}
+			
+			// Ligne 16: Si aucun sommet atteignable trouvé, arrêter
+			if (min >= Integer.MAX_VALUE / 2 || x == -1) {
+				break;
+			}
+			
+			// Ligne 17: Marquer le sommet choisi
+			mark[x] = true;
+			System.out.println("\nTraitement du sommet " + x + " (distance: " + val[x] + ")");
+			
+			// Lignes 18-22: Mise à jour des successeurs non fixés de x
+			for (int y = 0; y < n; y++) {
+				if (!mark[y] && matrix[x][y] > 0) { // il y a un arc de x vers y
+					int nouveauCost = val[x] + matrix[x][y];
+					if (nouveauCost < val[y]) {
+						val[y] = nouveauCost;
+						pred[y] = x;
+						System.out.println("  Mise à jour: sommet " + y + 
+								" nouvelle distance = " + val[y] + 
+								", prédécesseur = " + pred[y]);
+					}
+				}
+			}
+			
+			afficherEtat(mark, val, pred);
+		}
+		
+		// Affichage final des résultats
+		System.out.println("\n=== Résultats finaux ===");
+		System.out.println("Distances depuis le sommet " + s + ":");
+		for (int v = 0; v < n; v++) {
+			if (val[v] == Integer.MAX_VALUE / 2) {
+				System.out.println("Sommet " + v + ": INACCESSIBLE");
+			} else {
+				System.out.println("Sommet " + v + ": distance = " + val[v] + 
+						", prédécesseur = " + pred[v]);
+			}
+		}
+		
+		// Affichage des chemins
+		System.out.println("\nChemins optimaux:");
+		for (int v = 0; v < n; v++) {
+			if (v != s && val[v] != Integer.MAX_VALUE / 2) {
+				System.out.print("Chemin vers " + v + ": ");
+				afficherChemin(s, v, pred);
+				System.out.println(" (coût total: " + val[v] + ")");
+			}
+		}
+	}
+	
+	/**
+	 * Méthode utilitaire pour afficher l'état actuel des tableaux
+	 */
+	private void afficherEtat(boolean[] mark, int[] val, Integer[] pred) {
+		System.out.print("Marqués: [");
+		for (int i = 0; i < mark.length; i++) {
+			System.out.print(mark[i] ? "T" : "F");
+			if (i < mark.length - 1) System.out.print(", ");
+		}
+		System.out.println("]");
+		
+		System.out.print("Distances: [");
+		for (int i = 0; i < val.length; i++) {
+			if (val[i] == Integer.MAX_VALUE / 2) {
+				System.out.print("∞");
+			} else {
+				System.out.print(val[i]);
+			}
+			if (i < val.length - 1) System.out.print(", ");
+		}
+		System.out.println("]");
+		
+		System.out.print("Prédécesseurs: [");
+		for (int i = 0; i < pred.length; i++) {
+			System.out.print(pred[i] == null ? "null" : pred[i]);
+			if (i < pred.length - 1) System.out.print(", ");
+		}
+		System.out.println("]");
+	}
+	
+	/**
+	 * Méthode utilitaire pour afficher le chemin de s à v
+	 */
+	private void afficherChemin(int s, int v, Integer[] pred) {
+		if (v == s) {
+			System.out.print(s);
+		} else if (pred[v] == null) {
+			System.out.print("Pas de chemin");
+		} else {
+			afficherChemin(s, pred[v], pred);
+			System.out.print(" → " + v);
+		}
+	}
 
 	@Override
 	public String toString() {
@@ -65,72 +198,47 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 		return s.toString();
 	}
 
+	/**
+	 * Tests de l'algorithme de Dijkstra
+	 */
 	public static void main(String[] args) {
-        int[][] matrix = {
-            {0, 3, 0, 4, 0},
-            {0, 0, 2, 0, 0},
-            {0, 0, 0, 5, 1},
-            {6, 0, 0, 0, 0},
-            {0, 7, 0, 0, 0}
-        };
-        System.out.println("Test 1: Creating a directed valued graph with defined matrix.");
-        AdjacencyMatrixDirectedValuedGraph graph = new AdjacencyMatrixDirectedValuedGraph(matrix);
-        System.out.println(graph);
-        System.out.println("Number of nodes = " + graph.getNbNodes() + " (Should be 5) " + (graph.getNbNodes() == 5 ? "✅" : "❌"));
-        System.out.println("Number of arcs = " + graph.getNbArcs() + " (Should be 7) " + (graph.getNbArcs() == 7 ? "✅" : "❌"));
-
-        // Test 2: Check initial arcs and costs.
-        System.out.println("\nTest 2: Checking initial arcs and costs.");
-        boolean arc01 = graph.isArc(0, 1);
-        boolean arc10 = graph.isArc(1, 0);
-        System.out.println("Arc (0,1) exists? " + arc01 + " (Should be TRUE) " + (arc01 ? "✅" : "❌"));
-        System.out.println("Cost of arc (0,1) is 3? " + (graph.matrix[0][1] == 3) + " (Should be TRUE) " + (graph.matrix[0][1] == 3 ? "✅" : "❌"));
-        System.out.println("Arc (1,0) exists? " + arc10 + " (Should be FALSE) " + (!arc10 ? "✅" : "❌"));
-
-        // Test 3: Test successors and predecessors with costs.
-        System.out.println("\nTest 3: Testing successors and predecessors.");
-        List<Integer> successors2 = graph.getSuccessors(2);
-        List<Integer> predecessors1 = graph.getPredecessors(1);
-        System.out.println("Successors of vertex 2: " + successors2);
-        System.out.println("Cost to successor 3 is 5? " + (graph.matrix[2][3] == 5) + " (Should be TRUE) " + 
-                         (graph.matrix[2][3] == 5 ? "✅" : "❌"));
-        System.out.println("Predecessors of vertex 1: " + predecessors1);
-        System.out.println("Cost from predecessor 0 is 3? " + (graph.matrix[0][1] == 3) + " (Should be TRUE) " + 
-                         (graph.matrix[0][1] == 3 ? "✅" : "❌"));
-
-        // Test 4: Add new arc with cost.
-        System.out.println("\nTest 4: Adding new arc with cost.");
-        graph.addArc(1, 4, 8);
-        boolean arc14AfterAdd = graph.isArc(1, 4);
-        System.out.println("After adding arc (1,4) with cost 8:");
-        System.out.println("Arc (1,4) exists? " + arc14AfterAdd + " (Should be TRUE) " + (arc14AfterAdd ? "✅" : "❌"));
-        System.out.println("Cost of new arc is 8? " + (graph.matrix[1][4] == 8) + " (Should be TRUE) " + 
-                         (graph.matrix[1][4] == 8 ? "✅" : "❌"));
-        System.out.println(graph);
-
-        // Test 5: Update existing arc cost.
-        System.out.println("\nTest 5: Updating existing arc cost.");
-        int oldCost = graph.matrix[0][1];
-        graph.addArc(0, 1, 9);
-        int newCost = graph.matrix[0][1];
-        System.out.println("Original cost of arc (0,1): " + oldCost);
-        System.out.println("After updating arc (0,1) to cost 9:");
-        System.out.println("New cost is 9? " + (newCost == 9) + " (Should be TRUE) " + (newCost == 9 ? "✅" : "❌"));
-        System.out.println(graph);
-
-        // Test 6: Try to add self-loop.
-        System.out.println("\nTest 6: Testing self-loop prevention.");
-        graph.addArc(1, 1, 10);
-        System.out.println("Self-loop (1,1) was prevented? " + (!graph.isArc(1, 1)) + " (Should be TRUE) " + 
-                         (!graph.isArc(1, 1) ? "✅" : "❌"));
-
-        // Test 7: Error handling.
-        System.out.println("\nTest 7: Error handling.");
-        try {
-            graph.addArc(20, 30, 5);
-            System.out.println("❌ Failed to catch invalid vertices");
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println("Successfully caught invalid vertices exception ✅");
-        }
-    }
+		System.out.println("=== Tests de l'algorithme de Dijkstra ===\n");
+		
+		// Test 1: Graphe orienté simple
+		System.out.println("--- Test 1: Graphe orienté simple ---");
+		int[][] matrix1 = {
+			{0, 4, 2, 0, 0},
+			{0, 0, 1, 5, 0},
+			{0, 0, 0, 8, 10},
+			{0, 0, 0, 0, 2},
+			{3, 0, 0, 0, 0}
+		};
+		
+		AdjacencyMatrixDirectedValuedGraph graph1 = new AdjacencyMatrixDirectedValuedGraph(matrix1);
+		System.out.println("Graphe:");
+		System.out.println(graph1);
+		
+		graph1.dijkstra(0);
+		
+		System.out.println("\n--- Test 2: Graphe avec cycles ---");
+		int[][] matrix2 = {
+			{0, 1, 4, 0, 0},
+			{0, 0, 2, 6, 0},
+			{0, 0, 0, 3, 2},
+			{0, 0, 0, 0, 1},
+			{0, 0, 0, 0, 0}
+		};
+		
+		AdjacencyMatrixDirectedValuedGraph graph2 = new AdjacencyMatrixDirectedValuedGraph(matrix2);
+		System.out.println("Graphe:");
+		System.out.println(graph2);
+		
+		graph2.dijkstra(0);
+		
+		System.out.println("\n=== Complexité ===");
+		System.out.println("Complexité de Dijkstra (version naïve): O(n²)");
+		System.out.println("- n itérations de la boucle principale");
+		System.out.println("- À chaque itération: O(n) pour trouver le minimum + O(n) pour la mise à jour");
+		System.out.println("Optimisation possible avec un tas binaire: O((n + m) log n)");
+	}
 }
