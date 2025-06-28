@@ -1,6 +1,11 @@
 # Groupe - Bodin Brajdic Chavanel
+##TP 1
 
 
+##TP 2
+**Fichier :** `src/main/java/GraphAlgorithms/GraphToolsList.java`
+
+##TP 3
 ### 1. Plus Court Chemin - Algorithme de Dijkstra
 
 **Fichier :** `src/main/java/AdjacencyMatrix/AdjacencyMatrixDirectedValuedGraph.java`
